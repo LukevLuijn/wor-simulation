@@ -1,7 +1,7 @@
 # build
-build/*
-install/*
-log/*
+build
+install
+log
 
 # Tool
 clion-build.sh
