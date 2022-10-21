@@ -1,0 +1,12 @@
+# build
+build/*
+install/*
+log/*
+
+# Tool
+clion-build.sh
+compile_commands.jsons
+
+# Editor
+.idea
+.vscode
