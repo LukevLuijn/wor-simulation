@@ -134,7 +134,7 @@ void CupNode::initTransform() {
 void CupNode::initMarker() {
     marker_message_ = visualization_msgs::msg::Marker();
 
-    marker_message_.header.frame_id = cup_link_; //this->get_parameter("cup_link_name").get_parameter_value().get<std::string>();
+    marker_message_.header.frame_id = cup_link_;
     marker_message_.header.stamp = now();
 
     marker_message_.ns = "water_cup";
