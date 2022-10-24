@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(robot_simulation)
 
 set(CUP_EXE cup_node)
-set(FRAME_BC frame_bc_node)
+set(ARM_EXE arm_node)
 
 # Default to C99
 if (NOT CMAKE_C_STANDARD)
@@ -42,11 +42,19 @@ ament_target_dependencies( ${CUP_EXE}
         visualization_msgs
         geometry_msgs
         simulation_msgs)
-
 install(TARGETS ${CUP_EXE}
         DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY launch model
+add_executable(${ARM_EXE}
+        src/arm_node.cpp)
+target_include_directories(${ARM_EXE}
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
+ament_target_dependencies( ${ARM_EXE}
+        rclcpp)
+install(TARGETS ${ARM_EXE}
+        DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY launch model urdf
         DESTINATION share/${PROJECT_NAME})
 
 if (BUILD_TESTING)

@@ -5,7 +5,7 @@
 CupNode::CupNode()
         : Node("cup_node"), velocity_(0.0), buffer_(get_clock()), listener_(buffer_), broadcaster_(this) {
 
-    RCLCPP_INFO(this->get_logger(), "Hello world"); // TODO for testing
+    RCLCPP_INFO(this->get_logger(), "Hello world from cup node!"); // TODO for testing
 
     this->declare_parameter<double>("pos_x", 0.0);
     this->declare_parameter<double>("pos_y", 0.0);

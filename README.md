@@ -2,6 +2,18 @@
 
 Uitwerking van het beroepsproduct World of Robots - World: Simulatie.
 
+## TODO
+
+- launch rviz from launch file.
+- launch rqt from launch file (if possible).
+- display arm urdf in rviz.
+- write arm node code.
+- write demo script.
+- write design docs.
+- write user guide doc.
+
+- if possible do all the req's (time).
+
 ## Requirements
 
 |  #   |  Prio  | Beschrijving                                                                                                                                                                                                                                                                    |      Behaald       |
