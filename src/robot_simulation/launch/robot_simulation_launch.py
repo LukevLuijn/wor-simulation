@@ -15,7 +15,7 @@ def generate_launch_description():
             output="screen",
             emulate_tty=True,
             parameters=[
-                {"pos_x": 0.0, "pos_y": 0.0, "pos_z": 10.0, "sim_link_name": "sim_link", "bot_link_name":"bot_link", "cup_link_name": "cup_link"}
+                {"pos_x": 0.0, "pos_y": 0.0, "pos_z": 0.0, "sim_link_name": "sim_link", "bot_link_name":"bot_link", "cup_link_name": "cup_link"}
             ]
         )
     ])

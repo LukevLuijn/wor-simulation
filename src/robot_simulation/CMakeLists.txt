@@ -22,20 +22,32 @@ endif ()
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
+find_package(ament_index_cpp REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(ament_index_cpp REQUIRED)
+find_package(simulation_msgs REQUIRED)
 
 include_directories(include/${PROJECT_NAME}/)
 
-add_executable(${CUP_EXE} src/cup_node.cpp)
-target_include_directories(${CUP_EXE} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
-ament_target_dependencies( ${CUP_EXE} rclcpp tf2_ros visualization_msgs geometry_msgs ament_index_cpp)
-install(TARGETS ${CUP_EXE} DESTINATION lib/${PROJECT_NAME})
+add_executable(${CUP_EXE}
+        src/cup_node.cpp)
+target_include_directories(${CUP_EXE}
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
+ament_target_dependencies( ${CUP_EXE}
+        ament_index_cpp
+        rclcpp
+        tf2_ros
+        visualization_msgs
+        geometry_msgs
+        simulation_msgs)
 
-install(DIRECTORY launch model DESTINATION share/${PROJECT_NAME})
+install(TARGETS ${CUP_EXE}
+        DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY launch model
+        DESTINATION share/${PROJECT_NAME})
 
 if (BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)

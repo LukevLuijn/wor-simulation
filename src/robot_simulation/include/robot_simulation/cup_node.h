@@ -9,11 +9,20 @@
 #include "tf2_ros/transform_listener.h"
 
 #include "rclcpp/rclcpp.hpp"
-#include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+
+#include "visualization_msgs/msg/marker.hpp"
+#include "simulation_msgs/msg/speed.hpp"
+#include "simulation_msgs/msg/pose.hpp"
+#include "simulation_msgs/msg/state.hpp"
 
 
 class CupNode : public rclcpp::Node {
+
+    typedef simulation_msgs::msg::State State;
+    typedef simulation_msgs::msg::Pose Pose;
+    typedef simulation_msgs::msg::Speed Speed;
+    typedef visualization_msgs::msg::Marker Marker;
 
 public:
     CupNode();
@@ -23,13 +32,16 @@ public:
 private:
     void timerCallback();
 
-    void initNode();
+    void gripperCallback(const State::SharedPtr message);
 
     void updateMarker();
 
-    void initMarker();
-
     void updateTransform();
+
+    void updateTopics();
+
+private:
+    void initMarker();
 
     void initTransform();
 
@@ -42,11 +54,18 @@ private:
     tf2_ros::Buffer buffer_;
     tf2_ros::TransformListener listener_;
     tf2_ros::TransformBroadcaster broadcaster_;
-
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr publisher_;
-    rclcpp::TimerBase::SharedPtr timer_;
-    visualization_msgs::msg::Marker marker_;
     geometry_msgs::msg::TransformStamped transform_;
+
+    rclcpp::TimerBase::SharedPtr timer_;
+
+    rclcpp::Publisher<Marker>::SharedPtr marker_pub_;
+    rclcpp::Publisher<Pose>::SharedPtr pose_pub_;
+    rclcpp::Publisher<Speed>::SharedPtr speed_pub_;
+
+    Marker marker_message_;
+
+    rclcpp::Subscription<State>::SharedPtr state_sub_;
+
 };
 
 #endif //WOR_SIMULATION_CUP_NODE_H
