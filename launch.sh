@@ -13,6 +13,11 @@ run_command ()
 export LC_NUMERIC="en_US.UTF-8" # export to make sure
 . install/setup.bash # initialize ros environment
 
+# TODO
+ros2 launch robot_simulation robot_simulation_launch.py # Launch simulation
+exit
+# TODO
+
 run_command "${LAUNCH_RQT}" # Launch RQT
 run_command "${LAUNCH_RVIZ}" # Launch RVIZ
 

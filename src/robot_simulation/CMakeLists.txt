@@ -30,12 +30,13 @@ find_package(geometry_msgs REQUIRED)
 find_package(simulation_msgs REQUIRED)
 
 include_directories(include/${PROJECT_NAME}/)
+include_directories(include/utils/)
 
 add_executable(${CUP_EXE}
         src/cup_node.cpp)
 target_include_directories(${CUP_EXE}
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
-ament_target_dependencies( ${CUP_EXE}
+ament_target_dependencies(${CUP_EXE}
         ament_index_cpp
         rclcpp
         tf2_ros
@@ -46,11 +47,16 @@ install(TARGETS ${CUP_EXE}
         DESTINATION lib/${PROJECT_NAME})
 
 add_executable(${ARM_EXE}
-        src/arm_node.cpp)
+        src/arm_node.cpp
+        src/robot_arm.cpp
+        src/math_utils.cpp
+        src/string_utils.cpp
+        )
 target_include_directories(${ARM_EXE}
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
-ament_target_dependencies( ${ARM_EXE}
-        rclcpp)
+ament_target_dependencies(${ARM_EXE}
+        rclcpp
+        simulation_msgs)
 install(TARGETS ${ARM_EXE}
         DESTINATION lib/${PROJECT_NAME})
 
