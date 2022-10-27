@@ -21,7 +21,7 @@ exit
 run_command "${LAUNCH_RQT}" # Launch RQT
 run_command "${LAUNCH_RVIZ}" # Launch RVIZ
 
-ros2 launch robot_simulation robot_simulation_launch.py # Launch simulation
+ros2 launch robot_simulation robot_simulation.launch.py # Launch simulation
 
 exit
 

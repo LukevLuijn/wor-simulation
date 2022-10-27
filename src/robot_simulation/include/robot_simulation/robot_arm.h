@@ -8,6 +8,8 @@
 #include <array>
 #include <chrono>
 
+#include "geometry_msgs/msg/point.hpp"
+
 
 typedef std::chrono::system_clock::time_point TimePoint;
 typedef std::chrono::steady_clock::duration Duration;
@@ -30,7 +32,14 @@ struct Servo {
     double target_position_ = 0; // in radians
 };
 
+enum class GripperState_e : uint8_t {
+    CLOSED, OPENED
+};
+
 class RobotArm {
+
+    typedef geometry_msgs::msg::Point Point;
+
 public:
     static RobotArm &get() {
         static RobotArm instance;
@@ -38,9 +47,7 @@ public:
     }
 
 public:
-    void setTargetPosition(uint8_t index, uint16_t PWMValue);
-
-    void setMoveDuration(uint8_t index, uint16_t duration);
+    void updateRobot();
 
     void activateLink(uint8_t index);
 
@@ -48,7 +55,37 @@ public:
 
     void stopRobot();
 
+    void setTargetPosition(uint8_t index, uint16_t PWMValue);
+
+    void setMoveDuration(uint8_t index, uint16_t duration);
+
+    Point getGripperPosition() const;
+
+    GripperState_e getGripperState() const;
+
+    double getCurrentPosition(uint8_t index) const;
+
+    double getPreviousPosition(uint8_t index) const;
+
+    double getTargetPosition(uint8_t index) const;
+
     std::string toString() const;
+
+private:
+
+    static void deactivateLink(Servo& servo);
+
+    static int64_t durationToMS (Duration duration) ;
+
+    template<typename T>
+    T getter(uint8_t index, T value) const {
+        if (index < N_SERVOS) {
+            return value;
+        } else {
+            std::string servoIndex = std::to_string(static_cast<uint16_t>(index));
+            throw std::invalid_argument("servo index out of bounds: " + servoIndex);
+        }
+    }
 
 private:
     static constexpr uint8_t N_SERVOS = 6;

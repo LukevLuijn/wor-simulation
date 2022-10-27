@@ -28,6 +28,7 @@ find_package(tf2_ros REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(simulation_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 include_directories(include/${PROJECT_NAME}/)
 include_directories(include/utils/)
@@ -56,7 +57,10 @@ target_include_directories(${ARM_EXE}
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(${ARM_EXE}
         rclcpp
-        simulation_msgs)
+        tf2_ros
+        simulation_msgs
+        sensor_msgs
+        geometry_msgs)
 install(TARGETS ${ARM_EXE}
         DESTINATION lib/${PROJECT_NAME})
 
