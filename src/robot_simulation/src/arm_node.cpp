@@ -47,17 +47,17 @@ ArmNode::ArmNode() : Node("arm_node"), is_holding_cup_(false), buffer_(get_clock
 
     initJointState();
 
-//    TODO remove
-    std::vector<double> positions
-            {
-                    -45, 60, -50, -20, 1.2, 0
-            };
-
-    for (std::size_t i = 0; i < 6; ++i) {
-        RobotArm::get().setTargetPosition(i, positions[i]);
-        RobotArm::get().setMoveDuration(i, 5000);
-        RobotArm::get().activateLink(i);
-    }
+////    TODO remove
+//    std::vector<double> positions
+//            {
+//                    -45, 60, -50, -20, 1.2, 0
+//            };
+//
+//    for (std::size_t i = 0; i < 6; ++i) {
+//        RobotArm::get().setTargetPosition(i, positions[i]);
+//        RobotArm::get().setMoveDuration(i, 5000);
+//        RobotArm::get().activateLink(i);
+//    }
 
 }
 

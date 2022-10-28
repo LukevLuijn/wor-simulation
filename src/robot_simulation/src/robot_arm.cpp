@@ -89,7 +89,7 @@ void RobotArm::setTargetPosition(uint8_t index, uint16_t PWMValue) {
 
         const double pos = Utils::MathUtils::map(PWMValue, IN_MIN, IN_MAX, OUT_MIN, OUT_MAX);
         // axis two needs a 90 degree negative offset.
-        links_[index].target_position_ = (index == 2) ? pos - Utils::MathUtils::toRadians(90) : pos;
+        links_[index].target_position_ = pos;// TODO (index == 2) ? pos - Utils::MathUtils::toRadians(90) : pos;
     } else {
         throw std::invalid_argument("servo index out of bounds: " + std::to_string(static_cast<uint16_t>(index)));
     }
