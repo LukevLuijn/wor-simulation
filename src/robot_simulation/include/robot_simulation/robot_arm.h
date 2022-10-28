@@ -20,8 +20,8 @@ struct Servo {
     double min_position_; // in radians
     double max_position_; // in radians
 
-    uint16_t pwm_max_limit_;
     uint16_t pwm_min_limit_;
+    uint16_t pwm_max_limit_;
 
     TimePoint start_time_ = std::chrono::system_clock::now();
     Duration move_duration_ = std::chrono::milliseconds(1);
@@ -32,21 +32,21 @@ struct Servo {
     double target_position_ = 0; // in radians
 };
 
-enum class GripperState_e : uint8_t {
-    CLOSED, OPENED
-};
 
 class RobotArm {
 
     typedef geometry_msgs::msg::Point Point;
 
 public:
+    enum class GripperState_e : uint8_t {
+        CLOSED, OPENED
+    };
+public:
     static RobotArm &get() {
         static RobotArm instance;
         return instance;
     }
 
-public:
     void updateRobot();
 
     void activateLink(uint8_t index);
@@ -57,9 +57,9 @@ public:
 
     void setTargetPosition(uint8_t index, uint16_t PWMValue);
 
-    void setMoveDuration(uint8_t index, uint16_t duration);
+    void setTargetPosition(uint8_t index, double degrees);
 
-    Point getGripperPosition() const;
+    void setMoveDuration(uint8_t index, uint16_t duration);
 
     GripperState_e getGripperState() const;
 
@@ -69,13 +69,16 @@ public:
 
     double getTargetPosition(uint8_t index) const;
 
-    std::string toString() const;
+protected:
+    RobotArm();
+
+    virtual ~RobotArm() = default;
 
 private:
 
-    static void deactivateLink(Servo& servo);
+    static void deactivateLink(Servo &servo);
 
-    static int64_t durationToMS (Duration duration) ;
+    void checkGripperState();
 
     template<typename T>
     T getter(uint8_t index, T value) const {
@@ -89,15 +92,9 @@ private:
 
 private:
     static constexpr uint8_t N_SERVOS = 6;
+    const uint8_t GRIPPER_INDEX = 4;
+    GripperState_e current_gripper_state_;
     std::array<Servo, N_SERVOS> links_;
-
-    const std::array<std::string, N_SERVOS> servo_names_ = {
-            "base", "shoulder", "elbow", "wrist", "gripper", "hand"};
-
-protected:
-    RobotArm();
-
-    virtual ~RobotArm() = default;
 };
 
 

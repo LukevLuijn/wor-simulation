@@ -3,7 +3,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 CupNode::CupNode()
-        : Node("cup_node"), velocity_(0.0), buffer_(get_clock()), listener_(buffer_), broadcaster_(this) {
+        : Node("cup_node"), velocity_(0.0), cup_picked_up_(false), buffer_(get_clock()), listener_(buffer_), broadcaster_(this) {
 
     RCLCPP_INFO(this->get_logger(), "Hello world from cup node!"); // TODO for testing
 
@@ -16,14 +16,14 @@ CupNode::CupNode()
     this->declare_parameter<std::string>("cup_link_name", "cup_link"); // cup
 
     timer_ = this->create_wall_timer(std::chrono::milliseconds(10), std::bind(&CupNode::timerCallback, this));
-    state_sub_ = this->create_subscription<State>("sim/arm/gripper", 10,
-                                            std::bind(&CupNode::gripperCallback, this, std::placeholders::_1));
+    cup_pickup_sub_ = this->create_subscription<CupPickup>("sim/arm/cup_pickup", 10,
+                                                  std::bind(&CupNode::cupPickupCallback, this, std::placeholders::_1));
 
     marker_pub_ = create_publisher<Marker>("sim/cup/marker", 10);
     pose_pub_ = create_publisher<Pose>("sim/cup/pose", 10);
     speed_pub_ = create_publisher<Speed>("sim/cup/speed", 10);
 
-    sim_link_ = this->get_parameter("sim_link_name").get_parameter_value().get<std::string>();//"sim_link";
+    sim_link_ = "base_link";//this->get_parameter("sim_link_name").get_parameter_value().get<std::string>();//"sim_link";
     bot_link_ = this->get_parameter("bot_link_name").get_parameter_value().get<std::string>();//"bot_link";
     cup_link_ = this->get_parameter("cup_link_name").get_parameter_value().get<std::string>();//"cup_link";
 
@@ -38,25 +38,27 @@ void CupNode::timerCallback() {
     updateTopics();
 }
 
-void CupNode::gripperCallback(const State::SharedPtr message) {
+void CupNode::cupPickupCallback(const CupPickup::SharedPtr message) {
 
-    if (message->state == State::CLOSED) {
+    cup_picked_up_ = message->state; // == CupPickup::HOLDING
 
-        transform_.transform.translation.z = 10; // to test gravity
+    std::string targetFrameID = (cup_picked_up_) ? "hand" : sim_link_;
 
-        RCLCPP_INFO(this->get_logger(), "gripper is closed.");
-    } else {
-        // do nothing
-        RCLCPP_INFO(this->get_logger(), "gripper is open.");
+    Transform newTransform = buffer_.lookupTransform(targetFrameID, cup_link_, rclcpp::Time(0));
+    transform_.transform = newTransform.transform;
+    transform_.header.frame_id = targetFrameID;
+
+    if (cup_picked_up_)
+    {
+        RCLCPP_INFO(this->get_logger(), "cup is picked up!");
     }
-
 }
 
 void CupNode::updateMarker() {
 
-    marker_message_.pose.position.x = transform_.transform.translation.x;
-    marker_message_.pose.position.y = transform_.transform.translation.y;
-    marker_message_.pose.position.z = transform_.transform.translation.z;
+    marker_message_.pose.position.x = 0.0;//transform_.transform.translation.x;
+    marker_message_.pose.position.y = 0.0;//transform_.transform.translation.y;
+    marker_message_.pose.position.z = 0.0;//transform_.transform.translation.z;
 
     // based on movement
     marker_message_.pose.orientation.x = 0.0;
@@ -65,10 +67,25 @@ void CupNode::updateMarker() {
     marker_message_.pose.orientation.w = 1.0;
 
     // based on tilt of cup
-    marker_message_.color.r = 1.0f;
-    marker_message_.color.g = 1.0f;
-    marker_message_.color.b = 1.0f;
-    marker_message_.color.a = 1.0f;
+
+    if (cup_picked_up_)
+    {
+        // set color cyan
+        marker_message_.color.r = 0.0f;
+        marker_message_.color.g = 1.0f;
+        marker_message_.color.b = 1.0f;
+        marker_message_.color.a = 1.0f;
+    }
+    else
+    {
+        // set color red
+        marker_message_.color.r = 1.0f;
+        marker_message_.color.g = 1.0f;
+        marker_message_.color.b = 1.0f;
+        marker_message_.color.a = 1.0f;
+    }
+
+
 
     marker_message_.header.stamp = now();
 }
@@ -82,29 +99,31 @@ void CupNode::updateTransform() {
     geometry_msgs::msg::TransformStamped previous_transform;
     previous_transform = buffer_.lookupTransform(sim_link_, cup_link_, rclcpp::Time(0));
 
-    if (previous_transform.transform.translation.z > 0) // cup is in the air
+    if (!cup_picked_up_)
     {
-        rclcpp::Duration duration = now() - previous_transform.header.stamp;
-        double previous_velocity = velocity_;
-        velocity_ += GRAVITY * timeInSeconds(duration);
-        double average_velocity = ((previous_velocity + velocity_) / 2) * timeInSeconds(duration);
-        double new_trans_z = std::max(previous_transform.transform.translation.z - average_velocity, 0.0);
+        if (previous_transform.transform.translation.z > 0) // cup is in the air
+        {
+            rclcpp::Duration duration = now() - previous_transform.header.stamp;
+            double previous_velocity = velocity_;
+            velocity_ += GRAVITY * timeInSeconds(duration);
+            double average_velocity = ((previous_velocity + velocity_) / 2) * timeInSeconds(duration);
+            double new_trans_z = std::max(previous_transform.transform.translation.z - average_velocity, 0.0);
 
-        if (new_trans_z == 0) {
-            velocity_ = 0;
+            if (new_trans_z == 0) {
+                velocity_ = 0;
+            }
+            transform_.transform.translation.z = new_trans_z;
+        } else if (previous_transform.transform.translation.z < 0) // cup is below the ground
+        {
+            RCLCPP_INFO(this->get_logger(), "does this happen?");
+            // bring back to 0?
         }
-        transform_.transform.translation.z = new_trans_z;
-    } else if (previous_transform.transform.translation.z < 0) // cup is below the ground
-    {
-        RCLCPP_INFO(this->get_logger(), "does this happen?");
-        // bring back to 0?
     }
-
     transform_.header.stamp = now();
+
 }
 
-void CupNode::updateTopics()
-{
+void CupNode::updateTopics() {
     simulation_msgs::msg::Speed speed;
     speed.velocity = velocity_;
 
@@ -159,9 +178,9 @@ void CupNode::initMarker() {
     marker_message_.color.b = 1.0f;
     marker_message_.color.a = 1.0f;
 
-    marker_message_.pose.position.x = transform_.transform.translation.x;
-    marker_message_.pose.position.y = transform_.transform.translation.y;
-    marker_message_.pose.position.z = transform_.transform.translation.z;
+    marker_message_.pose.position.x =0.0; //transform_.transform.translation.x;
+    marker_message_.pose.position.y =0.0; //transform_.transform.translation.y;
+    marker_message_.pose.position.z =0.0; //transform_.transform.translation.z;
 
     marker_message_.pose.orientation.x = 0.0;
     marker_message_.pose.orientation.y = 0.0;

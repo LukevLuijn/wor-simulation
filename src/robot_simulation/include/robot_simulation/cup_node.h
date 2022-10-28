@@ -13,16 +13,21 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 
 #include "visualization_msgs/msg/marker.hpp"
+
 #include "simulation_msgs/msg/speed.hpp"
 #include "simulation_msgs/msg/pose.hpp"
-#include "simulation_msgs/msg/state.hpp"
+#include "simulation_msgs/msg/cup_pickup.hpp"
 
 
 class CupNode : public rclcpp::Node {
 
-    typedef simulation_msgs::msg::State State;
+//    typedef simulation_msgs::msg::State State;
+    typedef simulation_msgs::msg::CupPickup CupPickup;
     typedef simulation_msgs::msg::Pose Pose;
     typedef simulation_msgs::msg::Speed Speed;
+
+    typedef geometry_msgs::msg::TransformStamped Transform;
+
     typedef visualization_msgs::msg::Marker Marker;
 
 public:
@@ -33,7 +38,7 @@ public:
 private:
     void timerCallback();
 
-    void gripperCallback(const State::SharedPtr message);
+    void cupPickupCallback(const CupPickup::SharedPtr message);
 
     void updateMarker();
 
@@ -51,11 +56,13 @@ private:
 
     std::string sim_link_, bot_link_, cup_link_;
     double velocity_;
+    bool cup_picked_up_;
 
     tf2_ros::Buffer buffer_;
     tf2_ros::TransformListener listener_;
     tf2_ros::TransformBroadcaster broadcaster_;
-    geometry_msgs::msg::TransformStamped transform_;
+
+    Transform transform_;
 
     rclcpp::TimerBase::SharedPtr timer_;
 
@@ -65,8 +72,7 @@ private:
 
     Marker marker_message_;
 
-    rclcpp::Subscription<State>::SharedPtr state_sub_;
-
+    rclcpp::Subscription<CupPickup>::SharedPtr cup_pickup_sub_;
 };
 
 #endif //WOR_SIMULATION_CUP_NODE_H

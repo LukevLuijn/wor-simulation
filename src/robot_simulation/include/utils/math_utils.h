@@ -15,6 +15,12 @@ namespace Utils {
         static double toRadians(double degrees);
 
         static double map(double value, double inMin, double inMax, double outMin, double outMax);
+
+        template<typename T>
+        static bool between (T min, T max, T value)
+        {
+            return ( (value - max) * (value - min) <= 0);
+        }
     };
 }
 

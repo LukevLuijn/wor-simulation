@@ -6,10 +6,23 @@
 #include "robot_arm.h"
 
 #include "string_utils.h"
+#include "simulation_msgs/msg/cup_pickup.hpp"
 
-#include "geometry_msgs/msg/transform_stamped.hpp"
 
-ArmNode::ArmNode() : Node("arm_node"), broadcaster_(this) {
+/*
+straight
+ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P1500S4500#1P1499S4500#2P500S4500#3P1500S4500#4P1500S4500#5P1500S4500'}"
+
+park
+ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P500S4500#1P1833S4500#2P1500S4500#3P1500S4500#4P1500S4500#5P1500S4500'}"
+
+ready
+ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P1500S4500#1P1499S4500#2P1500S4500#3P1500S4500#4P1500S4500#5P1500S4500'}"
+ */
+
+
+ArmNode::ArmNode() : Node("arm_node"), is_holding_cup_(false), buffer_(get_clock()), listener_(buffer_),
+                     broadcaster_(this) {
     RCLCPP_INFO(this->get_logger(), "Hello world from arm node!"); // TODO for testing
 
     this->declare_parameter<double>("pos_x", 0.0);
@@ -20,65 +33,57 @@ ArmNode::ArmNode() : Node("arm_node"), broadcaster_(this) {
     this->declare_parameter<std::string>("bot_link_name", "bot_link"); // robot
     this->declare_parameter<std::string>("cup_link_name", "cup_link"); // cup
 
-    timer_ = this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&ArmNode::timerCallback, this));
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(10), std::bind(&ArmNode::timerCallback, this));
     command_sub_ = this->create_subscription<Command>("sim/controller/command", 10,
                                                       std::bind(&ArmNode::commandCallback, this,
                                                                 std::placeholders::_1));
 
-    joint_state_pub_ = create_publisher<JointState>(/*sim/arm/*/"joint_states", 10);
+    joint_state_pub_ = create_publisher<JointState>("joint_states", 10);
+    cup_pickup_pub_ = create_publisher<CupPickup>("sim/arm/cup_pickup", 10);
 
     sim_link_ = this->get_parameter("sim_link_name").get_parameter_value().get<std::string>();//"sim_link";
     bot_link_ = this->get_parameter("bot_link_name").get_parameter_value().get<std::string>();//"bot_link";
     cup_link_ = this->get_parameter("cup_link_name").get_parameter_value().get<std::string>();//"cup_link";
 
     initJointState();
+
+//    TODO remove
+    std::vector<double> positions
+            {
+                    -45, 60, -50, -20, 1.2, 0
+            };
+
+    for (std::size_t i = 0; i < 6; ++i) {
+        RobotArm::get().setTargetPosition(i, positions[i]);
+        RobotArm::get().setMoveDuration(i, 5000);
+        RobotArm::get().activateLink(i);
+    }
+
 }
 
 void ArmNode::timerCallback() {
-    // TODO calculate current positions.
 
     updateTransform();
     updateJointState();
 
     RobotArm::get().updateRobot();
 
+    if (!is_holding_cup_ && RobotArm::get().getGripperState() == RobotArm::GripperState_e::CLOSED) {
+        if (canPickupCup()) {
+            is_holding_cup_ = simulation_msgs::msg::CupPickup::HOLDING;
 
-    /**
-      * if gripper is closing && gripper position == cup position
-      *
-      *  arm is holding cup
-      *
-      * if gripper is opening && arm is holding cup
-      *
-      *  cup is released && arm is not holding cup
-      */
+            simulation_msgs::msg::CupPickup message;
+            message.state = is_holding_cup_;
+            cup_pickup_pub_->publish(message);
+        }
+    } else if (is_holding_cup_ && RobotArm::get().getGripperState() == RobotArm::GripperState_e::OPENED) {
+        is_holding_cup_ = simulation_msgs::msg::CupPickup::RELEASED;
 
-
-//
-//    if (!is_holding_cup_
-//        && RobotArm::get().getGripperState() == RobotArm::GripperState_e::CLOSED
-//        && RobotArm::get().getGripperPosition() == cupPosition)
-//    {
-//        is_holding_cup_ == true;
-//
-//        // publish to cup.
-//    }
-//    else if (is_holding_cup_
-//    && RobotArm::get(). getGripperState() == RobotArm::GripperState_e::OPENED)
-//    {
-//        is_holding_cup_ = false;
-//
-//        // publish to cup.
-//    }
-
+        simulation_msgs::msg::CupPickup message;
+        message.state = is_holding_cup_;
+        cup_pickup_pub_->publish(message);
+    }
 }
-
-//#0P500S5000#1P1833S5000#2P2000S5000#3P500S5000#4P2500S5000#5P500S5000      MAX
-//#0P2500S5000#1P500S5000#2P500S5000#3P2000S5000#4P500S5000#5P2500S5000    MIN
-
-
-//ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P500S5000#1P1833S5000#2P2000S5000#3P500S5000#4P2500S5000#5P500S5000'}"
-//ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P2500S5000#1P500S5000#2P500S5000#3P2000S5000#4P500S5000#5P2500S5000'}"
 
 void ArmNode::commandCallback(const Command::SharedPtr command_msg) {
     std::vector<ServoCommand> commands;
@@ -92,8 +97,6 @@ void ArmNode::commandCallback(const Command::SharedPtr command_msg) {
                 RobotArm::get().setTargetPosition(command.index_, command.position_);
                 RobotArm::get().setMoveDuration(command.index_, command.duration_);
                 RobotArm::get().activateLink(command.index_);
-
-                RCLCPP_INFO(this->get_logger(), "new command, moving robot");
             }
             catch (std::invalid_argument &e) {
                 RCLCPP_ERROR(this->get_logger(), "exception caught: %s", e.what());
@@ -105,6 +108,7 @@ void ArmNode::commandCallback(const Command::SharedPtr command_msg) {
             }
         }
     }
+    RCLCPP_INFO(this->get_logger(), "moving robot..");
 }
 
 bool ArmNode::parseCommandString(const std::string &command, std::vector<ServoCommand> &buffer) const {
@@ -155,8 +159,8 @@ bool ArmNode::parseCommandString(const std::string &command, std::vector<ServoCo
     buffer = commands;
     return true;
 }
-void ArmNode::updateJointState()
-{
+
+void ArmNode::updateJointState() {
     joint_state_message_.header.stamp = now();
     joint_state_message_.position = {
             RobotArm::get().getCurrentPosition(0), // base
@@ -170,20 +174,35 @@ void ArmNode::updateJointState()
     joint_state_pub_->publish(joint_state_message_);
 }
 
-void ArmNode::updateTransform()
-{
-    geometry_msgs::msg::TransformStamped transform;
+void ArmNode::updateTransform() {
+    transform_stamped_.header.frame_id = sim_link_;//"world_link";
+    transform_stamped_.child_frame_id = "base_link";
+    transform_stamped_.header.stamp = now();
 
-    transform.header.stamp = now();
-    transform.transform.translation.x = this->get_parameter("pos_x").get_parameter_value().get<double>();
-    transform.transform.translation.y = this->get_parameter("pos_y").get_parameter_value().get<double>();
-    transform.transform.translation.z = this->get_parameter("pos_z").get_parameter_value().get<double>();
+    transform_stamped_.transform.translation.x = this->get_parameter("pos_x").get_parameter_value().get<double>();
+    transform_stamped_.transform.translation.y = this->get_parameter("pos_y").get_parameter_value().get<double>();
+    transform_stamped_.transform.translation.z = this->get_parameter("pos_z").get_parameter_value().get<double>();
 
-    transform.header.frame_id = sim_link_;//"world_link";
-    transform.child_frame_id = "base_link";
-
-    broadcaster_.sendTransform(transform);
+    broadcaster_.sendTransform(transform_stamped_);
 }
+
+bool ArmNode::canPickupCup() {
+    const double MAX_OFFSET = 0.04;
+
+    Transform tfLeft = buffer_.lookupTransform(cup_link_, "gripper_left", rclcpp::Time(0));
+    Transform tfRight = buffer_.lookupTransform(cup_link_, "gripper_right", rclcpp::Time(0));
+
+    const double xLeft = tfLeft.transform.translation.x;
+    const double xRight = tfRight.transform.translation.x;
+    const double yLeft = tfLeft.transform.translation.y;
+    const double yRight = tfRight.transform.translation.y;
+
+    const double x = std::sqrt(std::pow(xLeft, 2) + std::pow(xRight, 2));
+    const double y = std::sqrt(std::pow(yLeft, 2) + std::pow(yRight, 2));
+
+    return (x <= MAX_OFFSET) && (y <= MAX_OFFSET);
+}
+
 
 void ArmNode::initJointState() {
     joint_state_message_.header.stamp = now();
@@ -207,6 +226,43 @@ void ArmNode::initJointState() {
     joint_state_pub_->publish(joint_state_message_);
 }
 
+// TODO Remove
+//void ArmNode::echoPosition() {
+//    auto echo = [](const std::vector<uint16_t> &positions) {
+//        std::string commandStr = "ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command \"{command: '";
+//        for (std::size_t i = 0; i < positions.size(); ++i) {
+//            commandStr.append("#" + std::to_string(i) + "P" + std::to_string(positions[i]) + "S4500");
+//        }
+//        commandStr.append("'}\"");
+//        std::cout << commandStr << std::endl;
+//    };
+//
+//    std::vector<uint16_t> pmin = {
+//            500, 1833, 500, 500, 2500, 500
+//    };
+//    std::vector<uint16_t> pmax = {
+//            2500, 500, 2000, 2500, 500, 2500
+//    };
+//    std::vector<uint16_t> pmid = {
+//            1500, 1166, 1250, 1500, 1500, 1500
+//    };
+//
+//
+//    std::vector<uint16_t> positions_straight = {
+//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -90.0, 90.0, 500.0, 2500.0)),
+//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -30.0, 90.0, 1833.0, 500.0)),
+//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, 0.0, 135.0, 500.0, 2000.0)),
+//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, 90.0, -90.0, 500.0, 2500.0)),
+//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -1.2, 1.2, 2500.0, 500.0)),
+//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -90.0, 90.0, 500.0, 2500.0))};
+//
+//    echo(positions_straight);
+////    echo(positions_park);
+////    echo(positions_ready);
+//    echo(pmin);
+//    echo(pmax);
+//    echo(pmid);
+//}
 
 int main(int argc, char **argv) {
     rclcpp::init(argc, argv);

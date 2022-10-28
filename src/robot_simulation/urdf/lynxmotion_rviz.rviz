@@ -116,12 +116,12 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /cup_marker
+        Value: /sim/cup/marker
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: sim_link
     Frame Rate: 30
   Name: root
   Tools:

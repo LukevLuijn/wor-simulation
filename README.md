@@ -4,9 +4,8 @@ Uitwerking van het beroepsproduct World of Robots - World: Simulatie.
 
 ## TODO
 
-- launch rviz from launch file.
 - launch rqt from launch file (if possible).
-- display arm urdf in rviz.
+
 - write arm node code.
 - write demo script.
 - write design docs.
@@ -25,9 +24,9 @@ Uitwerking van het beroepsproduct World of Robots - World: Simulatie.
 | PA04 | Should | Alle code voldoet aan de ROS C++ Style Guide.                                                                                                                                                                                                                                   | :heavy_check_mark: |
 |  --  |   --   | **VIRTUELE SERVO CONTROLLER**                                                                                                                                                                                                                                                   |         --         |
 | VS01 |  Must  | De virtuele controller luistert naar een topic waarop string messages in het formaat van de SSC-32U 1 worden geplaatst. Van de interface moeten ten minste commando’s zijn opgenomen voor het verplaatsen van de servo’s met een ingestelde duur en het stoppen van de servo’s. | :heavy_check_mark: |
-| VS02 |  Must  | De virtuele controller reageert op het topic (zie eis VS01) door bijbehorende joint_state messages te publiceren.                                                                                                                                                               |        :x:         |
-| VS03 |  Must  | De virtuele robotarm wordt gevisualiseerd in Rviz (een URDF-model van de arm is beschikbaar op OnderwijsOnline).                                                                                                                                                                |        :x:         |
-| VS04 |  Must  | De virtuele robotarm gedraagt zich realistisch m.b.t. tijdgedrag (servo’s roteren kost tijd en gaat geleidelijk).                                                                                                                                                               |        :x:         |
+| VS02 |  Must  | De virtuele controller reageert op het topic (zie eis VS01) door bijbehorende joint_state messages te publiceren.                                                                                                                                                               | :heavy_check_mark: |
+| VS03 |  Must  | De virtuele robotarm wordt gevisualiseerd in Rviz (een URDF-model van de arm is beschikbaar op OnderwijsOnline).                                                                                                                                                                | :heavy_check_mark: |
+| VS04 |  Must  | De virtuele robotarm gedraagt zich realistisch m.b.t. tijdgedrag (servo’s roteren kost tijd en gaat geleidelijk).                                                                                                                                                               | :heavy_check_mark: |
 | VS05 | Should | De virtuele robotarm kan op een willekeurige plaats in de virtuele wereld geplaatst worden.                                                                                                                                                                                     | :heavy_check_mark: |
 |  --  |   --   | **VIRTUEEL BEKERTJE**                                                                                                                                                                                                                                                           |         --         |
 | VC01 | Should | Er kan op een willekeurige plek in de virtuele wereld een bekertje geplaatst worden.                                                                                                                                                                                            | :heavy_check_mark: |
