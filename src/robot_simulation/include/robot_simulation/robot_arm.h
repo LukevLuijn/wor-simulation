@@ -40,27 +40,93 @@ public:
         static RobotArm instance;
         return instance;
     }
-
+    /**
+     * @brief updates robot based on target position and time passed.
+     */
     void updateRobot();
-
+    /**
+     * @brief activates link based on index.
+     *
+     * @param index link index.
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     void activateLink(uint8_t index);
-
+    /**
+     * @brief deactivates link based on index.
+     *
+     * @param index link index.
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     void deactivateLink(uint8_t index);
-
+    /**
+     * @brief deactivates all links.
+     */
     void stopRobot();
-
+    /**
+     * @brief set new target position for link.
+     *
+     * @param index index of link
+     * @param PWMValue new target position
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     void setTargetPosition(uint8_t index, uint16_t PWMValue);
-
+    /**
+     * @brief set new target position for link.
+     *
+     * @param index index of link
+     * @param degrees new target position
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     void setTargetPosition(uint8_t index, double degrees);
-
+    /**
+     * @brief set duration for current move.
+     *
+     * @param index index of link
+     * @param duration duration of move in milliseconds
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     void setMoveDuration(uint8_t index, uint16_t duration);
-
+    /**
+     * @brief get current state of gripper.
+     *
+     * @return current gripper state
+     * @see GripperState_e
+     */
     GripperState_e getGripperState() const;
-
+    /**
+     * @brief get current position of link.
+     *
+     * @param index index of link
+     *
+     * @return current position in radians
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     double getCurrentPosition(uint8_t index) const;
-
+    /**
+     * @brief get previous position of link.
+     *
+     * @param index index of link
+     *
+     * @return previous position in radians
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     double getPreviousPosition(uint8_t index) const;
-
+    /**
+     * @brief get target position of link.
+     *
+     * @param index index of link
+     *
+     * @return target position in radians
+     *
+     * @throws invalid_argument if servo index is out of bounds.
+     */
     double getTargetPosition(uint8_t index) const;
 
 protected:

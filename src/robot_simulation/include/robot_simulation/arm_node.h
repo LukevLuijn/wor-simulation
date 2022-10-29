@@ -48,7 +48,6 @@ private:
 
     bool canPickupCup();
 
-private:
     void initJointState();
 
 private:
