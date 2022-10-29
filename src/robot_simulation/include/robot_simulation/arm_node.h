@@ -37,7 +37,6 @@ public:
 
 private:
     void timerCallback();
-    void timerCallback2(); // todo remove
 
     void commandCallback(const Command::SharedPtr command_msg);
 
@@ -52,8 +51,6 @@ private:
 private:
     void initJointState();
 
-    void echoPosition();
-
 private:
     std::string sim_link_, bot_link_, cup_link_;
     bool is_holding_cup_;
@@ -63,7 +60,6 @@ private:
     tf2_ros::TransformBroadcaster broadcaster_;
 
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::TimerBase::SharedPtr timer2_; // todo remove
 
     rclcpp::Publisher<JointState>::SharedPtr joint_state_pub_;
     rclcpp::Publisher<CupPickup>::SharedPtr cup_pickup_pub_;

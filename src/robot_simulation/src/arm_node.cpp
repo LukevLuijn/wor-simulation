@@ -8,19 +8,6 @@
 #include "string_utils.h"
 #include "simulation_msgs/msg/cup_pickup.hpp"
 
-
-/*
-straight
-ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P1500S4500#1P1499S4500#2P500S4500#3P1500S4500#4P1500S4500#5P1500S4500'}"
-
-park
-ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P500S4500#1P1833S4500#2P1500S4500#3P1500S4500#4P1500S4500#5P1500S4500'}"
-
-ready
-ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command "{command: '#0P1500S4500#1P1499S4500#2P1500S4500#3P1500S4500#4P1500S4500#5P1500S4500'}"
- */
-
-
 ArmNode::ArmNode() : Node("arm_node"), is_holding_cup_(false), buffer_(get_clock()), listener_(buffer_),
                      broadcaster_(this) {
     RCLCPP_INFO(this->get_logger(), "Hello world from arm node!"); // TODO for testing
@@ -41,24 +28,11 @@ ArmNode::ArmNode() : Node("arm_node"), is_holding_cup_(false), buffer_(get_clock
     joint_state_pub_ = create_publisher<JointState>("joint_states", 10);
     cup_pickup_pub_ = create_publisher<CupPickup>("sim/arm/cup_pickup", 10);
 
-    sim_link_ = this->get_parameter("sim_link_name").get_parameter_value().get<std::string>();//"sim_link";
-    bot_link_ = this->get_parameter("bot_link_name").get_parameter_value().get<std::string>();//"bot_link";
-    cup_link_ = this->get_parameter("cup_link_name").get_parameter_value().get<std::string>();//"cup_link";
+    sim_link_ = this->get_parameter("sim_link_name").get_parameter_value().get<std::string>();
+    bot_link_ = this->get_parameter("bot_link_name").get_parameter_value().get<std::string>();
+    cup_link_ = this->get_parameter("cup_link_name").get_parameter_value().get<std::string>();
 
     initJointState();
-
-////    TODO remove
-//    std::vector<double> positions
-//            {
-//                    -45, 60, -50, -20, 1.2, 0
-//            };
-//
-//    for (std::size_t i = 0; i < 6; ++i) {
-//        RobotArm::get().setTargetPosition(i, positions[i]);
-//        RobotArm::get().setMoveDuration(i, 5000);
-//        RobotArm::get().activateLink(i);
-//    }
-
 }
 
 void ArmNode::timerCallback() {
@@ -175,7 +149,7 @@ void ArmNode::updateJointState() {
 }
 
 void ArmNode::updateTransform() {
-    transform_stamped_.header.frame_id = sim_link_;//"world_link";
+    transform_stamped_.header.frame_id = sim_link_;
     transform_stamped_.child_frame_id = "base_link";
     transform_stamped_.header.stamp = now();
 
@@ -203,7 +177,6 @@ bool ArmNode::canPickupCup() {
     return (x <= MAX_OFFSET) && (y <= MAX_OFFSET);
 }
 
-
 void ArmNode::initJointState() {
     joint_state_message_.header.stamp = now();
     joint_state_message_.name = {
@@ -225,44 +198,6 @@ void ArmNode::initJointState() {
     };
     joint_state_pub_->publish(joint_state_message_);
 }
-
-// TODO Remove
-//void ArmNode::echoPosition() {
-//    auto echo = [](const std::vector<uint16_t> &positions) {
-//        std::string commandStr = "ros2 topic pub --once /sim/controller/command simulation_msgs/msg/Command \"{command: '";
-//        for (std::size_t i = 0; i < positions.size(); ++i) {
-//            commandStr.append("#" + std::to_string(i) + "P" + std::to_string(positions[i]) + "S4500");
-//        }
-//        commandStr.append("'}\"");
-//        std::cout << commandStr << std::endl;
-//    };
-//
-//    std::vector<uint16_t> pmin = {
-//            500, 1833, 500, 500, 2500, 500
-//    };
-//    std::vector<uint16_t> pmax = {
-//            2500, 500, 2000, 2500, 500, 2500
-//    };
-//    std::vector<uint16_t> pmid = {
-//            1500, 1166, 1250, 1500, 1500, 1500
-//    };
-//
-//
-//    std::vector<uint16_t> positions_straight = {
-//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -90.0, 90.0, 500.0, 2500.0)),
-//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -30.0, 90.0, 1833.0, 500.0)),
-//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, 0.0, 135.0, 500.0, 2000.0)),
-//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, 90.0, -90.0, 500.0, 2500.0)),
-//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -1.2, 1.2, 2500.0, 500.0)),
-//            static_cast<uint16_t>(Utils::MathUtils::map(0.0, -90.0, 90.0, 500.0, 2500.0))};
-//
-//    echo(positions_straight);
-////    echo(positions_park);
-////    echo(positions_ready);
-//    echo(pmin);
-//    echo(pmax);
-//    echo(pmid);
-//}
 
 int main(int argc, char **argv) {
     rclcpp::init(argc, argv);

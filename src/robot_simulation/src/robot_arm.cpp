@@ -2,12 +2,8 @@
 // Created by luke on 25-10-22.
 //
 
-#include <iomanip>
 #include "robot_arm.h"
 #include "math_utils.h"
-
-// todo remove
-#include "iostream"
 
 RobotArm::RobotArm()
         : current_gripper_state_(GripperState_e::OPENED), links_(std::array<Servo, 6>{
@@ -88,8 +84,7 @@ void RobotArm::setTargetPosition(uint8_t index, uint16_t PWMValue) {
         const double OUT_MAX = links_[index].max_position_;
 
         const double pos = Utils::MathUtils::map(PWMValue, IN_MIN, IN_MAX, OUT_MIN, OUT_MAX);
-        // axis two needs a 90 degree negative offset.
-        links_[index].target_position_ = pos;// TODO (index == 2) ? pos - Utils::MathUtils::toRadians(90) : pos;
+        links_[index].target_position_ = pos;
     } else {
         throw std::invalid_argument("servo index out of bounds: " + std::to_string(static_cast<uint16_t>(index)));
     }

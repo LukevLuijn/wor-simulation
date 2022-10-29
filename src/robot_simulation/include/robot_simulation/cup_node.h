@@ -13,15 +13,14 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 
 #include "visualization_msgs/msg/marker.hpp"
+#include "std_msgs/msg/color_rgba.hpp"
 
 #include "simulation_msgs/msg/speed.hpp"
 #include "simulation_msgs/msg/pose.hpp"
 #include "simulation_msgs/msg/cup_pickup.hpp"
 
-
 class CupNode : public rclcpp::Node {
 
-//    typedef simulation_msgs::msg::State State;
     typedef simulation_msgs::msg::CupPickup CupPickup;
     typedef simulation_msgs::msg::Pose Pose;
     typedef simulation_msgs::msg::Speed Speed;
@@ -29,6 +28,7 @@ class CupNode : public rclcpp::Node {
     typedef geometry_msgs::msg::TransformStamped Transform;
 
     typedef visualization_msgs::msg::Marker Marker;
+    typedef std_msgs::msg::ColorRGBA Color;
 
 public:
     CupNode();
@@ -36,7 +36,9 @@ public:
     virtual ~CupNode() = default;
 
 private:
-    void timerCallback();
+    void baseTimerCallback();
+
+    void speedTimerCallback();
 
     void cupPickupCallback(const CupPickup::SharedPtr message);
 
@@ -46,31 +48,38 @@ private:
 
     void updateTopics();
 
-private:
     void initMarker();
 
     void initTransform();
 
+    static double timeInSeconds(const rclcpp::Duration &time) {
+        return static_cast<double>(time.nanoseconds()) / 1'000'000'000.0;
+    }
+
 private:
     const double GRAVITY = 9.81;
+    Color default_color_;
+    Color picked_up_color_;
 
     std::string sim_link_, bot_link_, cup_link_;
     double velocity_;
     bool cup_picked_up_;
 
+    Transform transform_;
+    Transform previous_tf_;
+    Marker marker_message_;
+    Speed speed_message_;
+
     tf2_ros::Buffer buffer_;
     tf2_ros::TransformListener listener_;
     tf2_ros::TransformBroadcaster broadcaster_;
 
-    Transform transform_;
-
-    rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::TimerBase::SharedPtr base_timer_;
+    rclcpp::TimerBase::SharedPtr speed_timer_;
 
     rclcpp::Publisher<Marker>::SharedPtr marker_pub_;
     rclcpp::Publisher<Pose>::SharedPtr pose_pub_;
     rclcpp::Publisher<Speed>::SharedPtr speed_pub_;
-
-    Marker marker_message_;
 
     rclcpp::Subscription<CupPickup>::SharedPtr cup_pickup_sub_;
 };

@@ -8,9 +8,6 @@
 #include <array>
 #include <chrono>
 
-#include "geometry_msgs/msg/point.hpp"
-
-
 typedef std::chrono::system_clock::time_point TimePoint;
 typedef std::chrono::steady_clock::duration Duration;
 
@@ -34,9 +31,6 @@ struct Servo {
 
 
 class RobotArm {
-
-    typedef geometry_msgs::msg::Point Point;
-
 public:
     enum class GripperState_e : uint8_t {
         CLOSED, OPENED

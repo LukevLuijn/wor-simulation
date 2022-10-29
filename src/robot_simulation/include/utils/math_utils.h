@@ -17,9 +17,8 @@ namespace Utils {
         static double map(double value, double inMin, double inMax, double outMin, double outMax);
 
         template<typename T>
-        static bool between (T min, T max, T value)
-        {
-            return ( (value - max) * (value - min) <= 0);
+        static bool between(T min, T max, T value) {
+            return ((value - max) * (value - min) <= 0);
         }
     };
 }
