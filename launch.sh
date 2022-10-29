@@ -3,7 +3,7 @@
 POS_Y=10
 run_command ()
 {
-  gnome-terminal --geometry 50x7+10+${POS_Y} -- sh -c "bash -c \"ls && ${1}\" "
+  gnome-terminal --geometry 50x7+10+${POS_Y} -- sh -c "bash -c \"${1}\" "
   POS_Y=$(($POS_Y + 200))
 }
 
