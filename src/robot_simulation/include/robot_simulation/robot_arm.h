@@ -7,6 +7,8 @@
 
 #include <array>
 #include <chrono>
+#include <stdexcept>
+#include <string>
 
 typedef std::chrono::system_clock::time_point TimePoint;
 typedef std::chrono::steady_clock::duration Duration;

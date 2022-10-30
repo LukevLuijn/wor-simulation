@@ -9,6 +9,7 @@
 
 #include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
+#include "tf2_ros/buffer.h"
 
 #include "simulation_msgs/msg/command.hpp"
 #include "simulation_msgs/msg/cup_pickup.hpp"
