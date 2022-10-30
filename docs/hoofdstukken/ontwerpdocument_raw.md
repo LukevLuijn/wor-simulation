@@ -10,12 +10,6 @@
 
 <div style="page-break-after: always;"></div>
 
-# Handleiding
-
-!sub handleiding.md
-
-<div style="page-break-after: always;"></div>
-
 # Ontwerp
 
 !sub ontwerp.md

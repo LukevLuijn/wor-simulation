@@ -36,6 +36,8 @@ Commando's voor de verschillende servo's kunnen samengevoegd worden zodat er een
 #0P2500S500#1P1833S500#2P1444S500#3P722S500#4P500S500#5P1000S500
 ```
 
+<div style="page-break-after: always;"></div>
+
 Commando's publiceren naar het topic waar de arm naar luistert: ```/sim/controller/command``` kan gerealiseerd worden door middel van het volgende commando:
 
 1. Nieuwe terminal (eenmalig)

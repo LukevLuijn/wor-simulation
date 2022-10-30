@@ -34,6 +34,9 @@ colcon build
 cd ~/wor_sim_review/
 ./launch.sh
 ```
+
+<div style="page-break-after: always;"></div>
+
 ### De applicatie gebruiken zonder launch script
 
 1. Applicatie (new terminal)
