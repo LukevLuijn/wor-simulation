@@ -20,12 +20,12 @@
 
 
 
-|                    |                                     |                      |                |
-| :----------------- | :---------------------------------- | -------------------- | -------------- |
+|                    |                                     |                      |                   |
+| :----------------- | :---------------------------------- | -------------------- |-------------------|
 | **Auteur**         | Luke van Luijn                      | **Docent**           | Chris van Uffelen |
-| **Student nummer** | 587478                              | **Plaats**           | Nijmegen       |
-| **Opleiding**      | HBO-ICT                             | **Datum**            | 30-10-2022     |
-| **Profiel**        | Embedded Software Development (ESD) | **Versie**           | 1.0            |
-| **Studiejaar**     | Jaar 3                              |                      |                |
+| **Student nummer** | 587478                              | **Plaats**           | Nijmegen          |
+| **Opleiding**      | HBO-ICT                             | **Datum**            | 30-10-2022        |
+| **Profiel**        | Embedded Software Development (ESD) | **Versie**           | 1.0               |
+| **Studiejaar**     | Jaar 3                              |                      |                   |
 
 <div style="page-break-after: always;"></div>

@@ -5,7 +5,7 @@ Verder is het mogelijk om handmatig commando's naar de virtuele controller te st
 ### Demo script
 
 Er is een kleine demonstratie opgezet om de verschillende capaciteiten van de robot weer te geven.
-Dit demo script zal onder andere het kopje oppakken en verplaatsen. Met het onderstaande commando kan het demo script uitgevoerd worden.
+Dit demo script zal onder andere het kopje oppakken en verplaatsen. Met het onderstaande commando kan het demoscript uitgevoerd worden.
 
 1. Demo script (new terminal)
 
@@ -17,7 +17,7 @@ cd ~/wor_sim_review/
 
 ### Bewegen door middel van commando's
 
-De verschillende servo's in de AL5D robot kunnen bewogen worden door middel van seriele commando's.
+De verschillende servo's in de AL5D robot kunnen bewogen worden door middel van seriële commando's.
 Omdat deze applicatie een simulatie is van de daadwerkelijke robotarm moeten de commando's verzonden worden door middel van een publicatie naar een ros topic waar de virtuele controller naar luistert.
 
 De commando's zijn onderverdeeld in drie onderdelen:

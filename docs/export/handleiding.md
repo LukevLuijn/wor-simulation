@@ -1,14 +1,14 @@
 
 # 1. Handleiding <a name="chapter0"></a>
 
-In de onderstaande hoofdstukken zullen twee aspecten aan bod komen. Ten eerste de installatie instructies. Deze instrcuties vertellen stap voor stap hoe de applicatie gebouwd kan worden.
+In de onderstaande hoofdstukken zullen twee aspecten aan bod komen. Ten eerste de installatie-instructies. Deze instructies vertellen stap voor stap hoe de applicatie gebouwd kan worden.
 
-Het tweede onderdeel; 'Bewegen van de robot', zal uitlegen hoe de applicatie gebruikt kan worden, dat wil zeggen, hoe de gebruiker de robot kan aansturen.
+Het tweede onderdeel; 'Bewegen van de robot', zal uitleggen hoe de applicatie gebruikt kan worden, dus, hoe de gebruiker de robot kan aansturen.
 
 # Inhoudsopgaven
 
 - 1 [Handleiding](#chapter0)
-	- 1.1 [Installatie instructies](#chapter1)
+	- 1.1 [Installatie-instructies](#chapter1)
 		- 1.1.1 [De applicatie gebruiken met launch script](#chapter2)
 		- 1.1.2 [De applicatie gebruiken zonder launch script](#chapter3)
 	- 1.2 [Bewegen van de robot](#chapter4)
@@ -17,7 +17,7 @@ Het tweede onderdeel; 'Bewegen van de robot', zal uitlegen hoe de applicatie geb
 
 <div style="page-break-after: always;"></div>
 
-## 1.1. Installatie instructies <a name="chapter1"></a>
+## 1.1. Installatie-instructies <a name="chapter1"></a>
 
 
 > **note** Tijdens de installatie wordt er vanuit gegaan dat de [ros2 - foxy fitzroy installatie](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html) succesvol is doorlopen.
@@ -58,7 +58,6 @@ cd ~/wor_sim_review/
 
 <div style="page-break-after: always;"></div>
 
-
 ### 1.1.2. De applicatie gebruiken zonder launch script <a name="chapter3"></a>
 
 1. Applicatie (new terminal)
@@ -93,7 +92,7 @@ Verder is het mogelijk om handmatig commando's naar de virtuele controller te st
 ### 1.2.1. Demo script <a name="chapter5"></a>
 
 Er is een kleine demonstratie opgezet om de verschillende capaciteiten van de robot weer te geven.
-Dit demo script zal onder andere het kopje oppakken en verplaatsen. Met het onderstaande commando kan het demo script uitgevoerd worden.
+Dit demo script zal onder andere het kopje oppakken en verplaatsen. Met het onderstaande commando kan het demoscript uitgevoerd worden.
 
 1. Demo script (new terminal)
 
@@ -105,7 +104,7 @@ cd ~/wor_sim_review/
 
 ### 1.2.2. Bewegen door middel van commando's <a name="chapter6"></a>
 
-De verschillende servo's in de AL5D robot kunnen bewogen worden door middel van seriele commando's.
+De verschillende servo's in de AL5D robot kunnen bewogen worden door middel van seriële commando's.
 Omdat deze applicatie een simulatie is van de daadwerkelijke robotarm moeten de commando's verzonden worden door middel van een publicatie naar een ros topic waar de virtuele controller naar luistert.
 
 De commando's zijn onderverdeeld in drie onderdelen:

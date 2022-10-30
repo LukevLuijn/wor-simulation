@@ -1,6 +1,6 @@
 
 
-In dit onderdeel zal dieper ingegaan worden op de werking en samenhang van de applicatie. In de onderstaande afbeelding is het klasse diagram te zien van de gehele applicatie.
+In dit onderdeel zal dieper ingegaan worden op de werking en samenhang van de applicatie. In de onderstaande afbeelding is het klassediagram te zien van de gehele applicatie.
 
 ![packages](../astah/export/robot_simulation/cd_robot_simulation.svg)
 
@@ -18,17 +18,17 @@ De cup_node is verantwoordelijk voor het weergeven van de cup in Rviz. De weerga
 
 |#|Naam|Beschrijving|
 |:---:|:---|:---|
-|01|**GRAVITY**|Const voor het berekenen van de neerwaarste snelheid van de cup.|
+|01|**GRAVITY**|Const voor het berekenen van de neerwaartse snelheid van de cup.|
 |02|**default_color_**|De kleur van het kopje wanneer deze niet vastgehouden wordt.|
 |03|**picked_up_color_**|De kleur van het kopje wanneer deze vastgehouden wordt.|
 |04|**sim_link_**|Naam van het frame gebruikt in de simulatie.|
 |05|**bot_link_**|Naam van het frame van de ArmNode klasse.|
 |06|**cup_link_**|Naam van het frame van de CupNode klasse.|
-|07|**velocity_**|De huidige neerwaarste snelheid van het kopje.|
+|07|**velocity_**|De huidige neerwaartse snelheid van het kopje.|
 |08|**cup_picked_up_**|True wanneer het kopje is opgepakt, false wanneer het kopje niet vastgehouden wordt.|
 |09|**transform_**|Huidige transform van het kopje.|
 |10|**previous_tf_**|Voorgaande transfrom van het kopje, wordt gebruikt voor het berekenen van de 3D snelheid van het kopje.|
-|11|**marker_message_**|Het bericht dat gepubliseert wordt zodat het kopje weergegeven kan worden in Rviz.|
+|11|**marker_message_**|Het bericht dat gepubliceerd wordt zodat het kopje weergegeven kan worden in Rviz.|
 |12|**speed_message_**|Het bericht dat de snelheid van het kopje publiceert.|
 |13|**buffer_**|Buffer die de verschillende transformaties bevat.|
 |14|**listener_**|Luistert naar de verschillende transforms in de applicatie en plaatst deze in de buffer.|
@@ -45,11 +45,11 @@ De cup_node is verantwoordelijk voor het weergeven van de cup in Rviz. De weerga
 |#|Naam|Beschrijving|
 |:---:|:---|:---|
 |01|**baseTimerCallback**|Wordt aangeroepen elke 10ms, update de verschillende topics.|
-|02|**speedTimerCallback**|Wordt aangeroepen elke 100ms, berekend de huidige snelheid van het kopje en publiseert deze.|
-|03|**cupPickupCallback**|Wordt aangeroepen wanneer de robotarm publiseert naar het cup_pickup topic. Als het kopje momenteel opgepakt is zal het meebewegen met de arm. Als het kopje losgelaten is zal het naar de grond vallen.|
-|04|**updateMarker**|Update de variablen van de marker_message_.|
-|05|**updateTransform**|Update de variablen van de transform_.|
-|06|**updatePosition**|Update de variablen van de position_message_|
+|02|**speedTimerCallback**|Wordt aangeroepen elke 100ms, berekend de huidige snelheid van het kopje en publiceert deze.|
+|03|**cupPickupCallback**|Wordt aangeroepen wanneer de robotarm publiceert naar het cup_pickup topic. Als het kopje momenteel opgepakt is zal het meebewegen met de arm. Als het kopje losgelaten is zal het naar de grond vallen.|
+|04|**updateMarker**|Update de variabelen van de marker_message_.|
+|05|**updateTransform**|Update de variabelen van de transform_.|
+|06|**updatePosition**|Update de variabelen van de position_message_|
 |07|**updateTopics**|Update de verschillende topics (zie bovenstaand). |
 |08|**initMarker**|Initialiseert de marker_message_.|
 |09|**initTransform**|Initialiseert de transform_.|
@@ -61,9 +61,9 @@ De cup_node is verantwoordelijk voor het weergeven van de cup in Rviz. De weerga
 
 ### Arm node
 
-De arm node is verantwoordelijk voor het interperteren van de door de gebruiker verstuurde commando's. Verder is deze klasse verantwoordelijk voor het publiceren van de huidige staat van de robotarm, deze informatie wordt gepubliceert door middel van JointStates ([sensor_msgs/msg/JointState](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/JointState.html)).
+De arm node is verantwoordelijk voor het interpreteren van de door de gebruiker verstuurde commando's. Verder is deze klasse verantwoordelijk voor het publiceren van de huidige staat van de robotarm, deze informatie wordt gepubliceerd door middel van JointStates ([sensor_msgs/msg/JointState](http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/JointState.html)).
 
-Zodra het commando voor het sluiten van de gripper is ontvangen zal de klasse checken of het toevallig op dezelfde locatie is met de gripper als het kopje. Als deze locaties hetzelfde zijn zal er een bericht gepubliceert worden naar het topic ```/sim/arm/cup_pickup```. Zodra de gripper weer opent zal er een bericht gestuurd worden naar hetzelfde topic.
+Zodra het commando voor het sluiten van de gripper is ontvangen zal de klasse checken of het toevallig op dezelfde locatie is met de gripper als het kopje. Als deze locaties hetzelfde zijn zal er een bericht gepubliceerd worden naar het topic ```/sim/arm/cup_pickup```. Zodra de gripper weer opent, zal er een bericht gestuurd worden naar hetzelfde topic.
 
 ![packages](../astah/export/robot_simulation/cd_arm_node.svg)
 
@@ -89,12 +89,12 @@ Zodra het commando voor het sluiten van de gripper is ontvangen zal de klasse ch
 
 |#|Naam|Beschrijving|
 |:---:|:---|:---|
-|01|**timerCallback**|Update de huidige transform, joint states, de robotarm en controlleert of het kopje toevallig is opgepakt.|
-|02|**commandCallback**|Wordt geactiveert zodra er een commando verstuurd is. Dit commando wordt geparsed en naar de robotarm verstuurd.|
+|01|**timerCallback**|Update de huidige transform, joint states, de robotarm en controleert of het kopje toevallig is opgepakt.|
+|02|**commandCallback**|Wordt geactiveerd zodra er een commando verstuurd is. Dit commando wordt geparsed en naar de robotarm verstuurd.|
 |03|**parseCommandString**|Deze methode parsed het inkomende command bericht.|
 |04|**updateJointStates**|Update de joint states op basis van de locatie van de robotarm.|
 |05|**updateTransform**|Update het transform bericht.|
-|06|**canPickupCup**|Checked of het kopje zich bevind tussen de gripper armen van de robotarm.|
+|06|**canPickupCup**|Checked of het kopje zich bevindt tussen de gripper armen van de robotarm.|
 |07|**initJointState**|Initialiseert het joint states bericht.|
 
 **!tabel** - *ArmNode: Methods*
@@ -123,8 +123,8 @@ De RobotArm klasse maakt gebruik van het singleton pattern. In de 'echte' wereld
 |#|Naam|Beschrijving|
 |:---:|:---|:---|
 |01|**get**|Get instance van de RobotArm klasse.|
-|02|**updateRobot**|Triggered een update van de verschillendes servo posities op basis van tijd.|
-|03|**activateLink**|Start een link zodat deze geupdate zal worden.|
+|02|**updateRobot**|Triggered een update van de verschillende servo posities op basis van tijd.|
+|03|**activateLink**|Start een link zodat deze geüpdatet zal worden.|
 |04|**deactivteLink**|Stop een link zodat deze niet meer geupdate zal worden.|
 |05|**stopRobot**|Stop alle links van de robot (noodstop).|
 |06|**setTargetPosition**|Zet een target positie van een servo.|
@@ -135,6 +135,6 @@ De RobotArm klasse maakt gebruik van het singleton pattern. In de 'echte' wereld
 |11|**getTargetPosition**|retourneer de target positie van een servo.|
 |12|**deactivateLink**|Stop een link zodat deze niet meer geupdate zal worden.|
 |13|**checkGripperState**|Check of de gripper momenteel gesloten of open is.|
-|14|**getter**|Een algemene getter die eerst de servo index controleerdt en vervolgens de waarde retourneerd.|
+|14|**getter**|Een algemene getter die eerst de servo index controleert en vervolgens de waarde retourneert.|
 
 **!tabel** - *ArmNode: Methods*
