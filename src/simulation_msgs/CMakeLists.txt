@@ -22,8 +22,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
         "msg/Speed.msg"
-        "msg/State.msg"
-        "msg/Pose.msg"
+        "msg/Position.msg"
         "msg/Command.msg"
         "msg/CupPickup.msg"
         DEPENDENCIES geometry_msgs

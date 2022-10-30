@@ -24,7 +24,7 @@ CupNode::CupNode()
                                                                      std::placeholders::_1));
 
     marker_pub_ = create_publisher<Marker>("sim/cup/marker", 10);
-    pose_pub_ = create_publisher<Pose>("sim/cup/pose", 10);
+    position_pub_ = create_publisher<Position>("sim/cup/position", 10);
     speed_pub_ = create_publisher<Speed>("sim/cup/speed", 10);
 
     sim_link_ = "base_link";//this->get_parameter("sim_link_name").get_parameter_value().get<std::string>();//"sim_link";
@@ -46,6 +46,8 @@ void CupNode::baseTimerCallback() {
     updateTransform();
     updateMarker();
     updateTopics();
+
+    updatePosition();
 }
 
 void CupNode::speedTimerCallback() {
@@ -104,12 +106,20 @@ void CupNode::updateTransform() {
     transform_.header.stamp = now();
 }
 
+void CupNode::updatePosition()
+{
+    geometry_msgs::msg::TransformStamped tf;
+    tf = buffer_.lookupTransform(cup_link_, sim_link_, rclcpp::Time(0));
+
+    simulation_msgs::msg::Position position;
+    position.x = tf.transform.translation.x;
+    position.y = tf.transform.translation.y;
+    position.z = tf.transform.translation.z;
+
+    position_pub_->publish(position);
+}
+
 void CupNode::updateTopics() {
-    simulation_msgs::msg::Pose pose;
-    pose.pose = marker_message_.pose;
-
-    pose_pub_->publish(pose);
-
     marker_pub_->publish(marker_message_);
     broadcaster_.sendTransform(transform_);
 }
